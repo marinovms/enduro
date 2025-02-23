@@ -1,0 +1,12 @@
+Makefile controls the desired step. Makefile actually invokes dedicated shell script.
+
+For simulation:         make sim
+For syntehsis (only)    make synth
+
+make all, make clean currently are not supported.
+
+Xcelium logic simulator is currently invoked for simulation.
+Vivdo is currently invoked for synthesis.
+Sepaerate licenses and instalation as prerequisites are needed,
+  
+
