@@ -46,7 +46,7 @@ module wr_fifo_ctrl #(
     reg [ADDR_WDTH-1    :0] rd_ptr;                         // Read pointer - bin value
 
     wire [ADDR_WDTH-1   :0] wr_ptr_old_inc;
-    wire [ADDR_WDTH-1   :0] rd_ptr_dec;
+//    wire [ADDR_WDTH-1   :0] rd_ptr_dec;
 
     wire                    full_w;                         // FIFO full
 
@@ -86,9 +86,9 @@ module wr_fifo_ctrl #(
     end
 
 assign wr_ptr_old_inc = wr_ptr_old+1;
-assign rd_ptr_dec = rd_ptr-1;                                                       // Need Read-1
+//assign rd_ptr_dec = rd_ptr;                                                       // Need Read-1
 
-assign full_w = (wr_ptr == rd_ptr_dec) & (wr_ptr_old_inc == rd_ptr_dec);
+assign full_w = (wr_ptr == rd_ptr) & (wr_ptr_old_inc == rd_ptr);
 
 //*****************************************************************************
 // Output assignments
