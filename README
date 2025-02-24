@@ -1,12 +1,31 @@
 Makefile controls the desired step. Makefile actually invokes dedicated shell script.
 
-For simulation:         make sim
-For syntehsis (only)    make synth
+File clean up
+--------------------------  
 
-make all, make clean currently are not supported.
+In order to remove files from certain run execute 'make clean' ->  TBD what to be removed
 
-Xcelium logic simulator is currently invoked for simulation.
-Vivdo is currently invoked for synthesis.
-Sepaerate licenses and instalation as prerequisites are needed,
+
+For simulation:
+--------------------------        
+
+In order to run simulation navigate to exact folder where this README is located and execute: 'make sim'. Separate .sh script is invoked performing siulation tool invocation.
+Xcelium logic simulator is currently set up for simulation as sepaerate licenses and instalation as prerequisites are needed.
+Currently there are no automatic checks implemented thus correct behaviour is confirmed by visual inspection of the waveforms. 
+
+
+For syntehsis (only):
+--------------------------
+
+In order to run synthesis navigate to exact folder where this README is located and execute: 'make synth'. Separate .sh script is invoked performing simulation tool invocation.
+Vivdo is currently set up for synthesis as sepaerate licenses and instalation as prerequisites are needed.
+
+
+
+
+
+
+
+
   
 
