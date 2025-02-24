@@ -41,13 +41,7 @@ module wr_fifo_ctrl #(
     integer j;
 
     reg [ADDR_WDTH-1    :0] wr_ptr;                         // Write pointer counter - bin value
-    reg [ADDR_WDTH-1    :0] wr_ptr_old;                     // Old write pointer counter - bin value
-
     reg [ADDR_WDTH-1    :0] rd_ptr;                         // Read pointer - bin value
-
-    wire [ADDR_WDTH-1   :0] wr_ptr_old_inc;
-//    wire [ADDR_WDTH-1   :0] rd_ptr_dec;
-
     wire                    full_w;                         // FIFO full
 
 //*****************************************************************************
@@ -65,37 +59,28 @@ module wr_fifo_ctrl #(
 // Write pointer - binary
 //*****************************************************************************
     always @(posedge clk, negedge rst_n) begin
-        if (!rst_n) begin
+        if (!rst_n)
             wr_ptr      <= {ADDR_WDTH{1'b0}};
-            wr_ptr_old  <= {ADDR_WDTH{1'b0}};
-        end else if (!sync_rst_n) begin
+        else if (!sync_rst_n)
             wr_ptr      <= {ADDR_WDTH{1'b0}};
-            wr_ptr_old  <= {ADDR_WDTH{1'b0}};
-        end else begin
+        else begin
             case ({wr_en, full_w})
-                {1'b1, 1'b0}:   begin
-                                    wr_ptr      <= wr_ptr+1;
-                                    wr_ptr_old  <= wr_ptr;
-                                end
-                default:        begin
-                                    wr_ptr      <= wr_ptr;
-                                    wr_ptr_old  <= wr_ptr_old;
-                                end
+                {1'b1, 1'b0}: wr_ptr <= wr_ptr + {{(ADDR_WDTH-1){1'b0}}, 1'b1};
+                default:      wr_ptr <= wr_ptr;
             endcase
         end
     end
 
-assign wr_ptr_old_inc = wr_ptr_old+1;
-//assign rd_ptr_dec = rd_ptr;                                                       // Need Read-1
-
-assign full_w = (wr_ptr == rd_ptr) & (wr_ptr_old_inc == rd_ptr);
+    assign full_w = (rd_ptr[ADDR_WDTH-1] ^ wr_ptr[ADDR_WDTH-1]) & (rd_ptr[ADDR_WDTH-2:0] == wr_ptr[ADDR_WDTH-2:0]);
 
 //*****************************************************************************
 // Output assignments
 //*****************************************************************************
-assign full = full_w;
-assign wr_ptr_bin = wr_ptr;
-assign wr_ptr_gray = wr_ptr ^ {1'b0, wr_ptr[ADDR_WDTH-1     :1]};                   // Bin2Gray
+    assign full = full_w;
+    assign wr_ptr_bin = wr_ptr;
+
+// This could be FF-ed as well
+    assign wr_ptr_gray = wr_ptr ^ (wr_ptr >> 1);                   // Bin2Gray
 
 //*****************************************************************************
 //                                  END OF FILE
