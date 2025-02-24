@@ -28,10 +28,10 @@ module tb();
 // Local definitions
 //=============================================================================
 localparam int unsigned SAXIS_CLKIN_PERIOD  = 1000;
-localparam int unsigned MAXIS_CLKIN_PERIOD  = 3000;  
+localparam int unsigned MAXIS_CLKIN_PERIOD  = 3400;  
 localparam int unsigned RESET_PERIOD        = 20000;
 
-localparam int unsigned ADDR_WDTH = 4;
+localparam int unsigned ADDR_WDTH = 3;
 localparam int unsigned DATA_WDTH = 8;
 
 reg m_axis_aresetn;
@@ -44,7 +44,8 @@ wire                  s_axis_tready;
     
 wire [DATA_WDTH-1 :0] m_axis_tdata;
 wire                  m_axis_tvalid;
-wire                  m_axis_tready = 1'b1;     // Always ready to receive data
+reg                   m_axis_tready;
+  
 
 //*****************************************************************************
 // Clock & Reset_N
@@ -84,6 +85,8 @@ wire                  m_axis_tready = 1'b1;     // Always ready to receive data
 //*****************************************************************************
     initial begin
     
+    m_axis_tready = 1'b0;
+      
     #(5*RESET_PERIOD);    
     wr_data ('hBA);
       
@@ -95,8 +98,68 @@ wire                  m_axis_tready = 1'b1;     // Always ready to receive data
       
     #100us;
     wr_data ('h55);      
+
+    #100us;
+    wr_data ('h01); 
       
+    #100us;
+    wr_data ('h02); 
+      
+    #100us;
+    wr_data ('h03);       
+
+    #100us;
+    wr_data ('h04); 
+      
+    #100us; 
+    @(posedge m_axis_clk);
+      m_axis_tready = 1'b1;
+      
+    #1ms; // Here the FIFO should be streamed out
+      
+    @(posedge m_axis_clk);
+      m_axis_tready = 1'b0;
     
+    #100us;  
+    wr_data ('h11);
+
+    #100us;
+    wr_data ('hCE);
+      
+    #100us;
+    wr_data ('hCA);      
+
+    #100us;
+    wr_data ('hFE); 
+      
+    #100us;
+    wr_data ('hDE); 
+      
+    #100us;
+    wr_data ('h22);       
+
+    #100us;
+    wr_data ('h33);       
+      
+    #100us;
+    wr_data ('h88); 
+
+// Extra write -> must not be accepted
+//    #100us;
+//    wr_data ('h9A);  
+      
+
+    #100us; 
+    @(posedge m_axis_clk);
+      m_axis_tready = 1'b1;
+      
+    #1ms; // Here the FIFO should be streamed out
+      
+    @(posedge m_axis_clk);
+      m_axis_tready = 1'b0;      
+    
+     
+    #500us; 
     $stop;
     end 
 
@@ -124,7 +187,8 @@ u_axi4_str_fifo (
 //*****************************************************************************
 // 
 //*****************************************************************************
-  task wr_data;
+
+  task automatic wr_data;
       input [DATA_WDTH-1  :0] data;
   begin
       @(posedge s_axis_clk);
@@ -136,6 +200,7 @@ u_axi4_str_fifo (
       end  
   end 
   endtask
+
 
 //*****************************************************************************
 //                                  END OF FILE
