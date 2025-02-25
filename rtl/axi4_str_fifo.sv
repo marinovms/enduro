@@ -101,7 +101,7 @@ u_dpbuf_mem (
   .wr_addr    (wr_ptr_bin[ADDR_WDTH-1:0]  ),
   .wr_din     (s_axis_tdata               ),
   
-  .rd_en      (~empty                     ),      // TODO: this must be double checked and eventually changed!
+  .rd_en      (~empty                     ),      
   .rd_addr    (rd_ptr_bin[ADDR_WDTH-1:0]  ),
 
   .rd_dout    (m_axis_tdata               ), 
@@ -126,7 +126,7 @@ u_rd_fifo_ctrl (
   .rd_ptr_bin (rd_ptr_bin       ), //Read pointer - bin value
   .rd_ptr_gray(rd_ptr_gray      ), //Read pointer - Gray value
   
-  .empty      (empty            ) //FIFO is empty   TODO: check empty implementation
+  .empty      (empty            ) //FIFO is empty   
   ); 
 
 //*****************************************************************************
