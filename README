@@ -20,6 +20,8 @@ For syntehsis (only):
 In order to run synthesis navigate to exact folder where this README is located and execute: 'make synth'. Separate .sh script is invoked performing simulation tool invocation.
 Vivdo is currently set up for synthesis as sepaerate licenses and instalation as prerequisites are needed.
 
+Some System Verilog construcs are used.
+
 
 
 
