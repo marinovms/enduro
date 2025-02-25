@@ -42,10 +42,12 @@ reg [DATA_WDTH-1  :0] s_axis_tdata;
 reg                   s_axis_tvalid;
 wire                  s_axis_tready;
     
-wire [DATA_WDTH-1 :0] m_axis_tdata;
-wire                  m_axis_tvalid;
+//wire [DATA_WDTH-1 :0] m_axis_tdata;
+//wire                  m_axis_tvalid;
 reg                   m_axis_tready;
   
+int seed = 5;
+int j;
 
 //*****************************************************************************
 // Clock & Reset_N
@@ -158,7 +160,15 @@ reg                   m_axis_tready;
     @(posedge m_axis_clk);
       m_axis_tready = 1'b0;      
     
-     
+    #100us;
+    @(posedge m_axis_clk);
+      m_axis_tready = 1'b1;
+      
+    for (j = 0; j < 101; j++) begin  
+      wr_data_stream();
+    end 
+      
+      
     #500us; 
     $stop;
     end 
@@ -167,21 +177,21 @@ reg                   m_axis_tready;
 // 
 //*****************************************************************************
 axi4_str_fifo #(
-  .ADDR_WDTH(ADDR_WDTH),
-  .DATA_WDTH(DATA_WDTH)
+  .ADDR_WDTH  (ADDR_WDTH),
+  .DATA_WDTH  (DATA_WDTH)
 )
 u_axi4_str_fifo (
-  .m_axis_aresetn(m_axis_aresetn),  //FIFO memory reset – synchronous to s_axis_clk. Active low
-  .m_axis_clk    (m_axis_clk),      //Master AXIS output clock
-  .s_axis_clk    (s_axis_clk),      //Slave AXIS input clock  
+  .m_axis_aresetn(m_axis_aresetn),      //FIFO memory reset – synchronous to s_axis_clk. Active low
+  .m_axis_clk    (m_axis_clk    ),      //Master AXIS output clock
+  .s_axis_clk    (s_axis_clk    ),      //Slave AXIS input clock  
 
-  .s_axis_tdata  (s_axis_tdata),    //Slave (input) AXIS data bus
-  .s_axis_tvalid (s_axis_tvalid),   //Slave (input) AXIS data valid flag
-  .s_axis_tready (s_axis_tready),   //Slave (input) AXIS ready to receive flag
+  .s_axis_tdata  (s_axis_tdata  ),      //Slave (input) AXIS data bus
+  .s_axis_tvalid (s_axis_tvalid ),      //Slave (input) AXIS data valid flag
+  .s_axis_tready (s_axis_tready ),      //Slave (input) AXIS ready to receive flag
 
-  .m_axis_tdata  (m_axis_tdata),
-  .m_axis_tvalid (m_axis_tvalid),   //Master (output) AXIS data valid flag  
-  .m_axis_tready (m_axis_tready)    //Master (output) AXIS ready to receive flag
+  .m_axis_tdata  (/*OPEN*/      ),
+  .m_axis_tvalid (/*OPEN*/      ),      //Master (output) AXIS data valid flag  
+  .m_axis_tready (m_axis_tready )       //Master (output) AXIS ready to receive flag
   ); 
 
 //*****************************************************************************
@@ -191,9 +201,11 @@ u_axi4_str_fifo (
   task automatic wr_data;
       input [DATA_WDTH-1  :0] data;
   begin
+    
       @(posedge s_axis_clk);
-        s_axis_tdata  <= data;
-        s_axis_tvalid <= 1'b1;
+      s_axis_tdata  <= data;
+      s_axis_tvalid <= 1'b1;
+    
       @(posedge s_axis_clk) begin
         wait (s_axis_tready);
         s_axis_tvalid <= 1'b0;
@@ -201,6 +213,23 @@ u_axi4_str_fifo (
   end 
   endtask
 
+
+  task automatic wr_data_stream;     
+  begin
+
+    @(posedge s_axis_clk) begin
+        s_axis_tdata  <= $random(seed);
+        s_axis_tvalid <= 1'b1;
+    end 
+
+    while (s_axis_tready) begin
+      @(posedge s_axis_clk);
+      s_axis_tdata  <= $random(seed);
+    end   
+
+    s_axis_tvalid <= 1'b0;
+  end  
+  endtask 
 
 //*****************************************************************************
 //                                  END OF FILE
